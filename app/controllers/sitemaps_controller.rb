@@ -1,10 +1,14 @@
 class SitemapsController < ApplicationController
   layout false
   
-  def sitemap
+  before_filter :set_headers
+  
+  # TODO: Make the expires configurable
+  caches_action :sitemap, {:expires_in => 24.hours}, :cache_path => "sitemap-xml"
+
+  def sitemap    
     new_page!
     instance_eval &DynamicSitemaps::Sitemap.draw_block
-    
     if params[:page]
       if pages.count > 1
         page = pages[params[:page].to_i - 1]
@@ -74,6 +78,11 @@ protected
       options[key] = value
     end
     options
+  end
+  
+  #Not sure why I need to set this, but when the page is cached, rails processes the action as html and sends the headers accordingly
+  def set_headers
+   headers["Content-Type"] = "application/xml; charset=utf-8" 
   end
   
 end

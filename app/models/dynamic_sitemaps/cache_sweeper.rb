@@ -1,5 +1,10 @@
 module DynamicSitemaps
   class CacheSweeper < ActiveRecord::Observer
+    
+    def after_create(resource)
+      expire_cache_for_sitemaps
+    end
+    
     def after_save(resource)
       expire_cache_for_sitemaps
     end
